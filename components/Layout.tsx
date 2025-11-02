@@ -38,11 +38,11 @@ export default function Layout({ restaurants, lastUpdated }: LayoutProps) {
             <div className="flex items-center gap-4">
               {/* 문의하기 링크 */}
               <a 
-                href="mailto:your-email@example.com" 
+                href="mailto:jinsoo.mw@gmail.com" 
                 className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors"
               >
                 <Mail className="w-4 h-4" />
-                <span className="hidden sm:inline">문의하기</span>
+                <span className="hidden sm:inline">contact: jinsoo.mw@gmail.com</span>
               </a>
               
               {/* 모바일 뷰 모드 전환 버튼 */}
