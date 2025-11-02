@@ -1,44 +1,154 @@
 import { Restaurant } from '@/lib/types';
-import { MapPin } from 'lucide-react';
+import Image from 'next/image';
+import { useState, useMemo } from 'react';
+import { Search } from 'lucide-react';
 
 interface RestaurantListProps {
   restaurants: Restaurant[];
+  selectedRestaurantId?: string | null;
+  onRestaurantSelect?: (restaurantId: string) => void;
+  lastUpdated?: string;
 }
 
-export default function RestaurantList({ restaurants }: RestaurantListProps) {
+function formatLastUpdated(dateString?: string) {
+  if (!dateString) return null;
+  
+  const date = new Date(dateString);
+  return date.toLocaleString('ko-KR', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+export default function RestaurantList({ restaurants, selectedRestaurantId, onRestaurantSelect, lastUpdated }: RestaurantListProps) {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredRestaurants = useMemo(() => {
+    if (!searchTerm.trim()) return restaurants;
+    
+    return restaurants.filter(restaurant => {
+      const searchText = searchTerm.toLowerCase();
+      return (
+        restaurant.name.toLowerCase().includes(searchText) ||
+        restaurant.cleanedMenuText?.toLowerCase().includes(searchText) ||
+        restaurant.menuText?.toLowerCase().includes(searchText)
+      );
+    });
+  }, [restaurants, searchTerm]);
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border md:h-full overflow-hidden">
+    <div className="bg-white rounded-r-lg md:rounded-r-none md:rounded-l-none shadow-sm border md:border-r-0 md:h-full overflow-hidden">
       <div className="p-4 border-b bg-gray-50">
-        <h2 className="text-lg font-semibold text-gray-900">식당 목록</h2>
-        <p className="text-sm text-gray-600 mt-1">총 {restaurants.length}개 식당</p>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="식당명이나 메뉴로 검색..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+        <div className="flex justify-between items-center mt-2">
+          <p className="text-sm text-gray-600">
+            {filteredRestaurants.length}개 식당 {searchTerm && `(전체 ${restaurants.length}개 중)`}
+          </p>
+          {lastUpdated && (
+            <p className="text-xs text-gray-500">
+              {formatLastUpdated(lastUpdated)}
+            </p>
+          )}
+        </div>
       </div>
       
-      <div className="overflow-y-auto md:h-full pb-4 space-y-0">
-        {restaurants.map((restaurant) => (
-          <div key={restaurant.id} className="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
-            <div className="flex items-start justify-between mb-2">
-              <h3 className="text-lg font-medium text-gray-900">{restaurant.name}</h3>
-              <div className="hidden sm:flex items-center text-xs text-gray-500">
-                <MapPin size={12} className="mr-1" />
-                {restaurant.coordinates[1].toFixed(4)}, {restaurant.coordinates[0].toFixed(4)}
-              </div>
+      <div className="overflow-y-auto h-[calc(100%-6rem)] md:h-[calc(100%-6rem)] space-y-0">
+        <div className="pb-6 space-y-0">
+        {filteredRestaurants.map((restaurant) => (
+          <div 
+            key={restaurant.id} 
+            className={`p-4 border-b border-gray-100 transition-colors ${
+              selectedRestaurantId === restaurant.id
+                ? 'bg-blue-50 border-blue-200'
+                : 'hover:bg-gray-50'
+            }`}
+          >
+            <div className="mb-3">
+              <h3 
+                className={`text-lg font-medium cursor-pointer transition-colors ${
+                  selectedRestaurantId === restaurant.id
+                    ? 'text-blue-700'
+                    : 'text-gray-900 hover:text-blue-600'
+                }`}
+                onClick={() => onRestaurantSelect?.(restaurant.id)}
+              >
+                {restaurant.name}
+              </h3>
             </div>
             
+
+            
             <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-2">오늘의 메뉴</h4>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
-                {restaurant.todaysMenu.map((menu, index) => (
-                  <span
-                    key={index}
-                    className="inline-block px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded-full text-center"
-                  >
-                    {menu}
-                  </span>
-                ))}
-              </div>
+              {restaurant.error ? (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <div className="flex items-start space-x-2">
+                    <svg className="w-4 h-4 text-red-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <p className="text-sm font-medium text-red-800">메뉴 정보를 불러올 수 없습니다</p>
+                      <p className="text-xs text-red-600 mt-1">{restaurant.error}</p>
+                    </div>
+                  </div>
+                </div>
+              ) : restaurant.cleanedMenuText ? (
+                <div className="space-y-2">
+                  {/* AI로 정제된 메뉴 */}
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <pre className="text-sm text-gray-800 whitespace-pre-wrap font-sans leading-relaxed">
+                      {restaurant.cleanedMenuText}
+                    </pre>
+                  </div>
+                  
+                  {/* 메뉴 이미지는 접을 수 있는 형태로 제공 */}
+                  {restaurant.menuImageUrl && (
+                    <details className="mt-2">
+                      <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">
+                        이미지 보기
+                      </summary>
+                      <div className="mt-2">
+                        <Image
+                          src={restaurant.menuImageUrl}
+                          alt={`${restaurant.name} 오늘의 메뉴`}
+                          width={400}
+                          height={300}
+                          className="w-full max-w-sm h-auto rounded-lg border border-gray-200"
+                          unoptimized={true}
+                        />
+                      </div>
+                    </details>
+                  )}
+                </div>
+              ) : restaurant.menuText ? (
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">
+                    {restaurant.menuText}
+                  </pre>
+                </div>
+              ) : (
+                <div className="text-sm text-gray-400 italic text-center py-4">
+                  아직 메뉴 정보가 없습니다
+                  <div className="text-xs text-gray-500 mt-1">
+                    평일 오전 10:10에 자동으로 업데이트됩니다
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ))}
+        </div>
       </div>
     </div>
   );

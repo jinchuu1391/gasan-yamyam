@@ -1,0 +1,37 @@
+# Google Cloud Build 설정 파일
+# 웹훅 트리거 또는 수동 빌드 시 사용됩니다
+
+steps:
+  # 1. Docker 이미지 빌드
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', 'gcr.io/$PROJECT_ID/gasan-yamyam:latest',
+      '.'
+    ]
+
+  # 2. Container Registry에 푸시
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/gasan-yamyam:latest']
+
+  # 3. Cloud Run에 배포
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run', 'deploy', 'gasan-yamyam',
+      '--image', 'gcr.io/$PROJECT_ID/gasan-yamyam:latest',
+      '--region', 'asia-northeast3',
+      '--platform', 'managed',
+      '--allow-unauthenticated',
+      '--memory', '1Gi',
+      '--cpu', '1',
+      '--max-instances', '10'
+    ]
+
+# 빌드된 이미지 저장
+images:
+  - 'gcr.io/$PROJECT_ID/gasan-yamyam:latest'
+
+# 빌드 옵션
+options:
+  machineType: 'E2_HIGHCPU_8'  # 빠른 빌드
+  logging: CLOUD_LOGGING_ONLY

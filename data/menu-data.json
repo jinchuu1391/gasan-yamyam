@@ -1,0 +1,75 @@
+{
+  "lastUpdated": "2025-11-02T08:44:00.332Z",
+  "restaurants": [
+    {
+      "id": "dasibom",
+      "name": "다시봄",
+      "coordinates": [
+        126.878271,
+        37.479803
+      ],
+      "kakaoChannelUrl": "http://pf.kakao.com/_xhNExmn",
+      "menuImageUrl": "http://k.kakaocdn.net/dn/xjun4/dJMcagX5R8m/jkzzx27k2yNjkdlOq3iSIk/img_m.jpg",
+      "menuText": "10월 31일 금요일\n미역국\n목삼겹소금구이\n해물까스\n폭신달콤 팬케익\n새콤비빔면\n부산오뎅볶음\n제주밀감\n직접담은 겉절이\n셀프비빔밥코너\n셀프라면코너\nⓒ urbanworkdasibom어반워크다시봄\nIdag\nCh\n다시봄 카톡채널 메뉴공지- 오전 10시",
+      "cleanedMenuText": "미역국\n목삼겹소금구이\n해물까스\n폭신달콤 팬케익\n새콤비빔면\n부산오뎅볶음\n제주밀감\n직접담은 겉절이\n셀프비빔밥코너\n셀프라면코너",
+      "todaysMenu": [
+        "10월 31일 금요일",
+        "미역국",
+        "목삼겹소금구이",
+        "해물까스",
+        "폭신달콤 팬케익",
+        "새콤비빔면",
+        "부산오뎅볶음",
+        "제주밀감",
+        "직접담은 겉절이",
+        "셀프비빔밥코너",
+        "셀프라면코너"
+      ],
+      "lastUpdated": "2025-11-02T08:44:00.331Z"
+    },
+    {
+      "id": "defolis",
+      "name": "디폴리스",
+      "coordinates": [
+        126.87719,
+        37.479949
+      ],
+      "kakaoChannelUrl": "http://pf.kakao.com/_iyscG",
+      "menuImageUrl": "http://k.kakaocdn.net/dn/dydU9A/dJMcake7xxO/CHM6A5Ga3xdwYEtixk0Yu0/img_m.jpg",
+      "menuText": "점심 (10/31 금요일)\n(점심.11시 10분~1시 30분 까지)\n잡곡밥/햅쌀밥\n돼지 맥적 불고기\n수제 등심 탕수육 & 소스\n해물완자. 소세지전 & 케찹\n구수한 누룽지/식빵 러스크\n사천 마파두부 덮밥\n김치 수제비국\n부추 김가루 무침/곰피 초무침\n양배추 야채 샐러드\n겉절이 김치 무침\n\"탄산음료\"\n수 맛있게 드세요.♡\n쌀:국내산,김치:국내(배추,무우:국내,고춧가루:중국),동부콩: 중국완두:미국\n・돈육:국내산,탕수육:국내산오징어:중국산 소시지 :국내산,두부콩미국산\n*** 위 식단은 사정에 따라 변경될 수 있습니다",
+      "cleanedMenuText": "잡곡밥/햅쌀밥\n돼지 맥적 불고기\n수제 등심 탕수육 & 소스\n해물완자. 소세지전 & 케찹\n구수한 누룽지/식빵 러스크\n사천 마파두부 덮밥\n김치 수제비국\n부추 김가루 무침/곰피 초무침\n양배추 야채 샐러드\n겉절이 김치 무침\n탄산음료",
+      "todaysMenu": [
+        "점심 (10/31 금요일)",
+        "잡곡밥/햅쌀밥",
+        "돼지 맥적 불고기",
+        "수제 등심 탕수육 & 소스",
+        "해물완자. 소세지전 & 케찹",
+        "구수한 누룽지/식빵 러스크",
+        "사천 마파두부 덮밥",
+        "김치 수제비국",
+        "부추 김가루 무침/곰피 초무침",
+        "양배추 야채 샐러드",
+        "겉절이 김치 무침",
+        "\"탄산음료\"",
+        "수 맛있게 드세요.♡"
+      ],
+      "lastUpdated": "2025-11-02T08:44:00.331Z"
+    },
+    {
+      "id": "babon",
+      "name": "밥온",
+      "coordinates": [
+        126.879429,
+        37.477828
+      ],
+      "kakaoChannelUrl": "http://pf.kakao.com/_mYxfen",
+      "menuImageUrl": "http://k.kakaocdn.net/dn/dLAGLO/dJMcabP1cnU/yTDdahSx44vatIMv709CK0/img_m.jpg",
+      "menuText": "밥 [ON]\n구 내 식당",
+      "todaysMenu": [
+        "밥 [ON]",
+        "구 내 식당"
+      ],
+      "lastUpdated": "2025-11-02T08:44:00.331Z"
+    }
+  ]
+}
