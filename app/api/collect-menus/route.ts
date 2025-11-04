@@ -4,6 +4,7 @@ import { extractTextFromMultipleImages } from '@/lib/vision-api';
 import { Restaurant } from '@/lib/types';
 import fs from 'fs/promises';
 import path from 'path';
+import { revalidatePath } from 'next/cache';
 
 // 구내식당 정보 (카카오톡 채널 URL 포함)
 const RESTAURANT_CONFIGS: Array<{
@@ -168,16 +169,13 @@ export async function GET() {
 // POST 요청: 메뉴 수집 실행 (수동 트리거 또는 크론 작업용)
 export async function POST() {
   try {
-    // 보안을 위해 특정 헤더나 토큰으로 인증할 수 있습니다
-    // const authHeader = request.headers.get('authorization');
-    // if (authHeader !== 'Bearer your-secret-token') {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
-    
     console.log('Manual menu collection triggered');
     
     const restaurants = await collectMenus();
     await saveMenuData(restaurants);
+    
+    // 🎯 여기에 추가!
+    revalidatePath('/');  // 메인 페이지 캐시 무효화
     
     return NextResponse.json({
       message: 'Menu collection completed successfully',
