@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { Search } from 'lucide-react';
 
 interface RestaurantListProps {
-  restaurants: Restaurant[];
+  restaurants?: Restaurant[];
   selectedRestaurantId?: string | null;
   onRestaurantSelect?: (restaurantId: string) => void;
   lastUpdated?: string;
@@ -23,13 +23,13 @@ function formatLastUpdated(dateString?: string) {
   });
 }
 
-export default function RestaurantList({ restaurants, selectedRestaurantId, onRestaurantSelect, lastUpdated }: RestaurantListProps) {
+export default function RestaurantList({ restaurants = [], selectedRestaurantId, onRestaurantSelect, lastUpdated }: RestaurantListProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredRestaurants = useMemo(() => {
     if (!searchTerm.trim()) return restaurants;
     
-    return restaurants.filter(restaurant => {
+    return restaurants?.filter(restaurant => {
       const searchText = searchTerm.toLowerCase();
       return (
         restaurant.name.toLowerCase().includes(searchText) ||

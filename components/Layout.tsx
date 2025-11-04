@@ -1,5 +1,5 @@
-'use client';
 
+'use client';
 import { useState, useCallback, useRef } from 'react';
 import { List, Map, Mail, ChevronLeft, ChevronRight } from 'lucide-react';
 import RestaurantList from './RestaurantList';
@@ -9,7 +9,7 @@ import { Restaurant } from '@/lib/types';
 type ViewMode = 'list' | 'map';
 
 interface LayoutProps {
-  restaurants: Restaurant[];
+  restaurants?: Restaurant[];
   lastUpdated?: string;
 }
 
@@ -111,12 +111,12 @@ export default function Layout({ restaurants, lastUpdated }: LayoutProps) {
             </div>
           </div>
           <div className="flex-1 relative">
-            <MapComponent 
+             <MapComponent 
               ref={mapRef}
               restaurants={restaurants} 
               selectedRestaurantId={selectedRestaurantId}
               onRestaurantSelect={handleRestaurantSelect}
-            />
+            /> 
           </div>
         </div>
 

@@ -16,7 +16,7 @@ import { MapPin, Loader2 } from 'lucide-react';
 const GASAN_CENTER_COORDINATES: [number, number] = [126.88254198968177, 37.48034809363842];
 
 interface MapComponentProps {
-  restaurants: Restaurant[];
+  restaurants?: Restaurant[];
   selectedRestaurantId?: string | null;
   onRestaurantSelect?: (restaurantId: string) => void;
 }
@@ -138,7 +138,7 @@ const MapComponent = forwardRef<MapComponentRef, MapComponentProps>(function Map
     moveToRestaurant: (restaurantId: string) => {
       if (!mapInstanceRef.current) return;
       
-      const restaurant = restaurants.find(r => r.id === restaurantId);
+      const restaurant = restaurants?.find(r => r.id === restaurantId);
       if (restaurant) {
         const view = mapInstanceRef.current.getView();
         view.animate({
@@ -229,7 +229,7 @@ const MapComponent = forwardRef<MapComponentRef, MapComponentProps>(function Map
       // 마커 레이어 생성
       const vectorSource = new VectorSource();
       
-      restaurants.forEach((restaurant) => {
+      restaurants?.forEach((restaurant) => {
         const feature = new Feature({
           geometry: new Point(fromLonLat(restaurant.coordinates)),
           name: restaurant.name,
@@ -284,7 +284,7 @@ const MapComponent = forwardRef<MapComponentRef, MapComponentProps>(function Map
 
     // 함수 실행
     initializeMapWithLocation();
-  }, [restaurants, onRestaurantSelect, userLocation]);
+  }, []);
 
   // 마커 스타일 업데이트 (별도 useEffect)
   useEffect(() => {
