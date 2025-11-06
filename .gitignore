@@ -40,4 +40,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-service-account.json
+service-account.jsongithub-actions-key.json

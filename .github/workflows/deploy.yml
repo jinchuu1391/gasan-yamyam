@@ -1,0 +1,61 @@
+name: Deploy Static Site
+
+on:
+  # 매일 평일 오전 10시 10분에 자동 실행 (KST 기준, UTC로는 01:10)
+  schedule:
+    - cron: '10 1 * * 1-5'  # 월-금 01:10 UTC (10:10 KST)
+  
+  # 수동 실행 가능
+  workflow_dispatch:
+  
+  # main 브랜치에 push될 때도 실행 (선택사항)
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - '.gitignore'
+      - '**.sh'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: gasan-yamyam
+      
+      - name: Submit build to Cloud Build
+        run: |
+          echo "🚀 Starting Cloud Build deployment..."
+          gcloud builds submit \
+            --config=cloudbuild.yaml \
+            --project=gasan-yamyam \
+            --timeout=20m
+      
+      - name: Deployment summary
+        if: success()
+        run: |
+          echo "✅ Deployment completed successfully!"
+          echo "🌐 Site URL: http://34.49.240.114"
+          echo "📊 Build logs: https://console.cloud.google.com/cloud-build/builds?project=gasan-yamyam"
+      
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed!"
+          echo "Please check the logs above for details."

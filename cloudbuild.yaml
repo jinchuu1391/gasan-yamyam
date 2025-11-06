@@ -1,37 +1,67 @@
 # Google Cloud Build 설정 파일
-# 웹훅 트리거 또는 수동 빌드 시 사용됩니다
+# Static 사이트 빌드 후 Cloud Storage에 배포
 
 steps:
-  # 1. Docker 이미지 빌드
-  - name: 'gcr.io/cloud-builders/docker'
-    args: [
-      'build', 
-      '-t', 'gcr.io/$PROJECT_ID/gasan-yamyam:latest',
-      '.'
-    ]
-
-  # 2. Container Registry에 푸시
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/gasan-yamyam:latest']
-
-  # 3. Cloud Run에 배포
-  - name: 'gcr.io/cloud-builders/gcloud'
-    args: [
-      'run', 'deploy', 'gasan-yamyam',
-      '--image', 'gcr.io/$PROJECT_ID/gasan-yamyam:latest',
-      '--region', 'asia-northeast3',
-      '--platform', 'managed',
-      '--allow-unauthenticated',
-      '--memory', '1Gi',
-      '--cpu', '1',
-      '--max-instances', '10'
-    ]
-
-# 빌드된 이미지 저장
-images:
-  - 'gcr.io/$PROJECT_ID/gasan-yamyam:latest'
+  # 1. 의존성 설치
+  - name: 'node:20'
+    entrypoint: 'npm'
+    args: ['ci']
+    
+  # 2. 메뉴 데이터 수집 + Static 빌드 (prebuild가 자동 실행됨)
+  - name: 'node:20'
+    entrypoint: 'npm'
+    args: ['run', 'build']
+    env:
+      - 'NODE_ENV=production'
+    secretEnv: ['GEMINI_API_KEY']
+  
+  # 3. 404.html 생성 (Next.js export는 404/index.html을 생성)
+  - name: 'bash'
+    args:
+      - '-c'
+      - |
+        if [ -f out/404/index.html ]; then
+          cp out/404/index.html out/404.html
+        fi
+  
+  # 4. Cloud Storage에 업로드 (rsync로 변경된 파일만 업로드)
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args: 
+      - '-m'
+      - 'rsync'
+      - '-r'
+      - '-c'  # checksum 비교로 변경된 파일만 업로드
+      - '-d'  # 삭제된 파일 제거
+      - './out/'
+      - 'gs://gasan-yamyam-web/'
+  
+  # 5. 캐시 헤더 설정 (HTML은 짧게, 정적 파일은 길게)
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args:
+      - '-m'
+      - 'setmeta'
+      - '-h'
+      - 'Cache-Control:public, max-age=300'  # 5분
+      - 'gs://gasan-yamyam-web/**.html'
+  
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args:
+      - '-m'
+      - 'setmeta'
+      - '-h'
+      - 'Cache-Control:public, max-age=31536000'  # 1년
+      - 'gs://gasan-yamyam-web/_next/**'
 
 # 빌드 옵션
 options:
-  machineType: 'E2_HIGHCPU_8'  # 빠른 빌드
+  machineType: 'E2_HIGHCPU_8'
   logging: CLOUD_LOGGING_ONLY
+
+# Secret Manager 설정
+availableSecrets:
+  secretManager:
+    - versionName: projects/gasan-yamyam/secrets/gemini-api-key/versions/latest
+      env: 'GEMINI_API_KEY'
+
+# 타임아웃 설정 (메뉴 수집 시간 고려)
+timeout: '1200s'  # 20분
