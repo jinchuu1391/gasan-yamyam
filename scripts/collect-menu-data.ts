@@ -11,22 +11,22 @@ import path from 'path';
 // 구내식당 정보
 const RESTAURANT_CONFIGS = [
   {
-    id: "dasibom",
+    id: "다시봄",
     name: "다시봄",
     coordinates: [126.878271, 37.479803] as [number, number],
     kakaoChannelUrl: "http://pf.kakao.com/_xhNExmn"
   },
   {
-    id: "defolis",
+    id: "디폴리스",
     name: "디폴리스",
     coordinates: [126.877190, 37.479949] as [number, number],
     kakaoChannelUrl: "http://pf.kakao.com/_iyscG"
   },
   {
-    id: 'baeksang',
-    name: '백상',
-    coordinates: [126.877444, 37.482465] as [number, number],
-    kakaoChannelUrl: 'https://pf.kakao.com/_VQqxmG/posts'
+    id: '바른식탁',
+    name: '바른식탁',
+    coordinates: [126.882037, 37.477172 ] as [number, number],
+    kakaoChannelUrl: 'https://pf.kakao.com/_bXxkxhb'
   }
 ];
 
