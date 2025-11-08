@@ -8,6 +8,7 @@ interface RestaurantListProps {
   selectedRestaurantId?: string | null;
   onRestaurantSelect?: (restaurantId: string) => void;
   lastUpdated?: string;
+  gridColumns?: number; // 데스크탑 그리드 열 개수 (1 또는 2)
 }
 
 function formatLastUpdated(dateString?: string) {
@@ -23,7 +24,13 @@ function formatLastUpdated(dateString?: string) {
   });
 }
 
-export default function RestaurantList({ restaurants = [], selectedRestaurantId, onRestaurantSelect, lastUpdated }: RestaurantListProps) {
+export default function RestaurantList({ 
+  restaurants = [], 
+  selectedRestaurantId, 
+  onRestaurantSelect, 
+  lastUpdated,
+  gridColumns = 1 
+}: RestaurantListProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredRestaurants = useMemo(() => {
@@ -64,90 +71,92 @@ export default function RestaurantList({ restaurants = [], selectedRestaurantId,
         </div>
       </div>
       
-      <div className="overflow-y-auto h-[calc(100%-6rem)] md:h-[calc(100%-6rem)] space-y-0">
-        <div className="pb-6 space-y-0">
-        {filteredRestaurants.map((restaurant) => (
-          <div 
-            key={restaurant.id} 
-            className={`p-4 border-b border-gray-100 transition-colors ${
-              selectedRestaurantId === restaurant.id
-                ? 'bg-blue-50 border-blue-200'
-                : 'hover:bg-gray-50'
-            }`}
-          >
-            <div className="mb-3">
-              <h3 
-                className={`text-lg font-medium cursor-pointer transition-colors ${
-                  selectedRestaurantId === restaurant.id
-                    ? 'text-blue-700'
-                    : 'text-gray-900 hover:text-blue-600'
-                }`}
-                onClick={() => onRestaurantSelect?.(restaurant.id)}
-              >
-                {restaurant.name}
-              </h3>
-            </div>
-            
-
-            
-            <div>
-              {restaurant.error ? (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <div className="flex items-start space-x-2">
-                    <svg className="w-4 h-4 text-red-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div>
-                      <p className="text-sm font-medium text-red-800">메뉴 정보를 불러올 수 없습니다</p>
-                      <p className="text-xs text-red-600 mt-1">{restaurant.error}</p>
-                    </div>
-                  </div>
-                </div>
-              ) : restaurant.cleanedMenuText ? (
-                <div className="space-y-2">
-                  {/* AI로 정제된 메뉴 */}
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                    <pre className="text-sm text-gray-800 whitespace-pre-wrap font-sans leading-relaxed">
-                      {restaurant.cleanedMenuText}
-                    </pre>
-                  </div>
-                  
-                  {/* 메뉴 이미지는 접을 수 있는 형태로 제공 */}
-                  {restaurant.menuImageUrl && (
-                    <details className="mt-2">
-                      <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">
-                        이미지 보기
-                      </summary>
-                      <div className="mt-2">
-                        <Image
-                          src={restaurant.menuImageUrl}
-                          alt={`${restaurant.name} 오늘의 메뉴`}
-                          width={400}
-                          height={300}
-                          className="w-full max-w-sm h-auto rounded-lg border border-gray-200"
-                          unoptimized={true}
-                        />
+      <div className="overflow-y-auto h-[calc(100%-6rem)] md:h-[calc(100%-6rem)]">
+        <div className={`pb-6 ${gridColumns === 2 ? 'grid grid-cols-2 gap-4 p-4' : 'space-y-0'}`}>
+          {filteredRestaurants.map((restaurant) => (
+            <div 
+              key={restaurant.id} 
+              className={`${gridColumns === 2 ? 'flex flex-col' : ''} ${gridColumns !== 2 ? 'border-b border-gray-100' : ''} transition-all cursor-pointer ${
+                selectedRestaurantId === restaurant.id
+                  ? 'bg-blue-50 ring-2 ring-blue-500 rounded-lg'
+                  : 'bg-white hover:bg-gray-50 border border-gray-200 rounded-lg hover:shadow-md'
+              }`}
+              onClick={() => onRestaurantSelect?.(restaurant.id)}
+            >
+              {/* 식당명 - 가운데 정렬 */}
+              <div className={`${gridColumns === 2 ? 'p-3 border-b' : 'p-4 pb-2'} bg-gray-50`}>
+                <h3 
+                  className={`text-lg font-bold text-center transition-colors ${
+                    selectedRestaurantId === restaurant.id
+                      ? 'text-blue-700'
+                      : 'text-gray-900'
+                  }`}
+                >
+                  {restaurant.name}
+                </h3>
+              </div>
+              
+              {/* 메뉴 내용 - 고정 높이 */}
+              <div className={`${gridColumns === 2 ? 'flex-1 p-3' : 'p-4 pt-2'} overflow-hidden`}>
+                <div className={gridColumns === 2 ? 'h-64 overflow-y-auto' : ''}>
+                  {restaurant.error ? (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                      <div className="flex items-start space-x-2">
+                        <svg className="w-4 h-4 text-red-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                          <p className="text-sm font-medium text-red-800">메뉴 정보를 불러올 수 없습니다</p>
+                          <p className="text-xs text-red-600 mt-1">{restaurant.error}</p>
+                        </div>
                       </div>
-                    </details>
+                    </div>
+                  ) : restaurant.cleanedMenuText ? (
+                    <div className="space-y-2">
+                      {/* AI로 정제된 메뉴 */}
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                        <pre className="text-sm text-gray-800 whitespace-pre-wrap font-sans leading-relaxed">
+                          {restaurant.cleanedMenuText}
+                        </pre>
+                      </div>
+                      
+                      {/* 메뉴 이미지는 접을 수 있는 형태로 제공 */}
+                      {restaurant.menuImageUrl && (
+                        <details className="mt-2">
+                          <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">
+                            이미지 보기
+                          </summary>
+                          <div className="mt-2">
+                            <Image
+                              src={restaurant.menuImageUrl}
+                              alt={`${restaurant.name} 오늘의 메뉴`}
+                              width={400}
+                              height={300}
+                              className="w-full max-w-sm h-auto rounded-lg border border-gray-200"
+                              unoptimized={true}
+                            />
+                          </div>
+                        </details>
+                      )}
+                    </div>
+                  ) : restaurant.menuText ? (
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                      <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">
+                        {restaurant.menuText}
+                      </pre>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-400 italic text-center py-4">
+                      아직 메뉴 정보가 없습니다
+                      <div className="text-xs text-gray-500 mt-1">
+                        평일 오전 10:10에 자동으로 업데이트됩니다
+                      </div>
+                    </div>
                   )}
                 </div>
-              ) : restaurant.menuText ? (
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                  <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">
-                    {restaurant.menuText}
-                  </pre>
-                </div>
-              ) : (
-                <div className="text-sm text-gray-400 italic text-center py-4">
-                  아직 메뉴 정보가 없습니다
-                  <div className="text-xs text-gray-500 mt-1">
-                    평일 오전 10:10에 자동으로 업데이트됩니다
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
         </div>
       </div>
     </div>

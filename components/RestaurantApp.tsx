@@ -1,19 +1,19 @@
-
 'use client';
 import { useState, useCallback, useRef } from 'react';
-import { List, Map, Mail, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import AppHeader from './AppHeader';
 import RestaurantList from './RestaurantList';
 import MapComponent, { MapComponentRef } from './MapComponent';
 import { Restaurant } from '@/lib/types';
 
 type ViewMode = 'list' | 'map';
 
-interface LayoutProps {
+interface RestaurantAppProps {
   restaurants?: Restaurant[];
   lastUpdated?: string;
 }
 
-export default function Layout({ restaurants, lastUpdated }: LayoutProps) {
+export default function RestaurantApp({ restaurants, lastUpdated }: RestaurantAppProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
   const [isListCollapsed, setIsListCollapsed] = useState(false);
@@ -21,59 +21,15 @@ export default function Layout({ restaurants, lastUpdated }: LayoutProps) {
 
   const handleRestaurantSelect = useCallback((restaurantId: string) => {
     setSelectedRestaurantId(restaurantId);
+    // 모바일에서는 지도 뷰로 자동 전환
+    setViewMode('map');
     // 지도로 직접 이동 명령
     mapRef.current?.moveToRestaurant(restaurantId);
   }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 헤더 */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <h1 className="text-xl font-semibold text-gray-900">
-              가산디지털단지 구내식당
-            </h1>
-            
-            <div className="flex items-center gap-4">
-              {/* 문의하기 링크 */}
-              <a 
-                href="mailto:jinsoo.mw@gmail.com" 
-                className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                <Mail className="w-4 h-4" />
-                <span className="hidden sm:inline">contact: jinsoo.mw@gmail.com</span>
-              </a>
-              
-              {/* 모바일 뷰 모드 전환 버튼 */}
-              <div className="flex md:hidden bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setViewMode('list')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'list'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <List size={16} />
-                목록
-              </button>
-              <button
-                onClick={() => setViewMode('map')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'map'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <Map size={16} />
-                지도
-              </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AppHeader viewMode={viewMode} onViewModeChange={setViewMode} />
 
       {/* 메인 콘텐츠 */}
       <main className="h-[calc(100vh-4rem)] bg-gray-50">        
@@ -81,7 +37,7 @@ export default function Layout({ restaurants, lastUpdated }: LayoutProps) {
         <div className="hidden md:flex md:overflow-y-auto h-full relative">
           <div 
             className={`relative z-10 transition-all duration-300 ease-in-out ${
-              isListCollapsed ? 'w-12' : 'w-1/3'
+              isListCollapsed ? 'w-12' : 'w-1/2'
             }`}
           >
             <div className="h-full shadow-xl shadow-black/10 relative">
@@ -91,6 +47,7 @@ export default function Layout({ restaurants, lastUpdated }: LayoutProps) {
                   selectedRestaurantId={selectedRestaurantId}
                   onRestaurantSelect={handleRestaurantSelect}
                   lastUpdated={lastUpdated}
+                  gridColumns={2}
                 />
               )}
               
@@ -115,7 +72,7 @@ export default function Layout({ restaurants, lastUpdated }: LayoutProps) {
               ref={mapRef}
               restaurants={restaurants} 
               selectedRestaurantId={selectedRestaurantId}
-              onRestaurantSelect={handleRestaurantSelect}
+              onRestaurantSelect={setSelectedRestaurantId}
             /> 
           </div>
         </div>
@@ -137,7 +94,7 @@ export default function Layout({ restaurants, lastUpdated }: LayoutProps) {
                 ref={mapRef}
                 restaurants={restaurants} 
                 selectedRestaurantId={selectedRestaurantId}
-                onRestaurantSelect={handleRestaurantSelect}
+                onRestaurantSelect={setSelectedRestaurantId}
               />
             </div>
           )}

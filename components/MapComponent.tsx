@@ -258,7 +258,7 @@ const MapComponent = forwardRef<MapComponentRef, MapComponentProps>(function Map
         const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => feature);
         if (feature) {
           const restaurant = feature.get('restaurant') as Restaurant;
-          
+          onRestaurantSelect?.(restaurant.id);
           // 클릭된 식당으로 애니메이션과 함께 이동
           const view = map.getView();
           view.animate({
@@ -286,9 +286,9 @@ const MapComponent = forwardRef<MapComponentRef, MapComponentProps>(function Map
     initializeMapWithLocation();
   }, []);
 
-  // 마커 스타일 업데이트 (별도 useEffect)
+  // 마커 스타일 업데이트 + 선택된 식당으로 지도 중심 이동
   useEffect(() => {
-    if (!vectorLayerRef.current) return;
+    if (!vectorLayerRef.current || !mapInstanceRef.current) return;
 
     const vectorSource = vectorLayerRef.current.getSource();
     if (!vectorSource) return;
@@ -298,7 +298,20 @@ const MapComponent = forwardRef<MapComponentRef, MapComponentProps>(function Map
       const isSelected = selectedRestaurantId === restaurant.id;
       feature.setStyle(createMarkerStyle(restaurant, isSelected));
     });
-  }, [selectedRestaurantId]);
+
+    // 선택된 식당이 있으면 해당 위치로 지도 중심 이동
+    if (selectedRestaurantId) {
+      const selectedRestaurant = restaurants?.find(r => r.id === selectedRestaurantId);
+      if (selectedRestaurant) {
+        const view = mapInstanceRef.current.getView();
+        view.animate({
+          center: fromLonLat(selectedRestaurant.coordinates),
+          zoom: 18,
+          duration: 1000,
+        });
+      }
+    }
+  }, [selectedRestaurantId, restaurants]);
 
   return (
     <div className="bg-white rounded-lg md:rounded-l-none shadow-sm border md:border-l-0 h-full overflow-hidden relative">
