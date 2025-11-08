@@ -1,6 +1,6 @@
 import { Restaurant } from '@/lib/types';
 import Image from 'next/image';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search } from 'lucide-react';
 
 interface RestaurantListProps {
@@ -31,7 +31,18 @@ export default function RestaurantList({
   lastUpdated,
   gridColumns = 1 
 }: RestaurantListProps) {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [inputValue, setInputValue] = useState(''); // 사용자 입력값
+  const [searchTerm, setSearchTerm] = useState(''); // 실제 검색에 사용되는 값
+
+  // 디바운싱: 입력이 멈춘 후 1초 뒤에 검색 실행
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchTerm(inputValue);
+    }, 1000);
+
+    // 클린업: 새로운 입력이 들어오면 이전 타이머 취소
+    return () => clearTimeout(timer);
+  }, [inputValue]);
 
   const filteredRestaurants = useMemo(() => {
     if (!searchTerm.trim()) return restaurants;
@@ -54,8 +65,8 @@ export default function RestaurantList({
           <input
             type="text"
             placeholder="식당명이나 메뉴로 검색..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -78,7 +89,7 @@ export default function RestaurantList({
               key={restaurant.id} 
               className={`${gridColumns === 2 ? 'flex flex-col' : ''} ${gridColumns !== 2 ? 'border-b border-gray-100' : ''} transition-all cursor-pointer ${
                 selectedRestaurantId === restaurant.id
-                  ? 'bg-blue-50 ring-2 ring-blue-500 rounded-lg'
+                  ? 'bg-blue-50 rounded-lg'
                   : 'bg-white hover:bg-gray-50 border border-gray-200 rounded-lg hover:shadow-md'
               }`}
               onClick={() => onRestaurantSelect?.(restaurant.id)}
@@ -86,11 +97,7 @@ export default function RestaurantList({
               {/* 식당명 - 가운데 정렬 */}
               <div className={`${gridColumns === 2 ? 'p-3 border-b' : 'p-4 pb-2'} bg-gray-50`}>
                 <h3 
-                  className={`text-lg font-bold text-center transition-colors ${
-                    selectedRestaurantId === restaurant.id
-                      ? 'text-blue-700'
-                      : 'text-gray-900'
-                  }`}
+                  className={`text-lg font-bold text-center transition-colors`}
                 >
                   {restaurant.name}
                 </h3>
