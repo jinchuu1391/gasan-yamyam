@@ -21,8 +21,6 @@ export default function RestaurantApp({ restaurants, lastUpdated }: RestaurantAp
 
   const handleRestaurantSelect = useCallback((restaurantId: string) => {
     setSelectedRestaurantId(restaurantId);
-    // 모바일에서는 지도 뷰로 자동 전환
-    setViewMode('map');
     // 지도로 직접 이동 명령
     mapRef.current?.moveToRestaurant(restaurantId);
   }, []);
