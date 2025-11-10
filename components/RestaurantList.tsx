@@ -126,25 +126,6 @@ export default function RestaurantList({
                           {restaurant.cleanedMenuText}
                         </pre>
                       </div>
-                      
-                      {/* 메뉴 이미지는 접을 수 있는 형태로 제공 */}
-                      {restaurant.menuImageUrl && (
-                        <details className="mt-2">
-                          <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">
-                            이미지 보기
-                          </summary>
-                          <div className="mt-2">
-                            <Image
-                              src={restaurant.menuImageUrl}
-                              alt={`${restaurant.name} 오늘의 메뉴`}
-                              width={400}
-                              height={300}
-                              className="w-full max-w-sm h-auto rounded-lg border border-gray-200"
-                              unoptimized={true}
-                            />
-                          </div>
-                        </details>
-                      )}
                     </div>
                   ) : restaurant.menuText ? (
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
