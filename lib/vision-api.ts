@@ -5,14 +5,32 @@ import { cleanMenuText } from './text-cleaner';
 import path from 'path';
 
 // Google Vision API 클라이언트 초기화
+// Vercel: GOOGLE_SERVICE_ACCOUNT_KEY 환경 변수 사용 (JSON 문자열)
 // 로컬 개발: service-account.json 파일 사용
-// Google Cloud 환경: ADC(Application Default Credentials) 자동 사용
-const visionClient = new ImageAnnotatorClient({
-  // 로컬에서는 service-account.json 파일 경로 지정
-  ...(process.env.NODE_ENV !== 'production' && {
-    keyFilename: path.join(process.cwd(), 'service-account.json')
-  })
-});
+const getVisionClient = () => {
+  // Vercel 배포 환경: 환경 변수에서 서비스 계정 키 로드
+  if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
+    try {
+      const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
+      return new ImageAnnotatorClient({ credentials });
+    } catch (error) {
+      console.error('Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY:', error);
+      throw error;
+    }
+  }
+  
+  // 로컬 개발: service-account.json 파일 사용
+  if (process.env.NODE_ENV !== 'production') {
+    return new ImageAnnotatorClient({
+      keyFilename: path.join(process.cwd(), 'service-account.json')
+    });
+  }
+  
+  // ADC(Application Default Credentials) 사용 (GCP 환경)
+  return new ImageAnnotatorClient();
+};
+
+const visionClient = getVisionClient();
 
 /**
  * Google Vision API를 사용하여 이미지에서 텍스트를 추출하는 함수
