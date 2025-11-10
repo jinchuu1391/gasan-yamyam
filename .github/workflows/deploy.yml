@@ -1,4 +1,4 @@
-name: Rebuild and Deploy
+name: Daily Menu Update
 
 on:
   # 매일 평일 오전 10시 10분에 자동 실행 (KST 기준, UTC로는 01:10)
@@ -8,14 +8,7 @@ on:
   # 수동 실행 가능
   workflow_dispatch:
   
-  # main 브랜치에 push될 때도 실행
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'README.md'
-      - '.gitignore'
-      - '**.md'
+  # push 트리거 제거 - Vercel 자동 배포로 처리
 
 jobs:
   trigger-vercel-deploy:
@@ -24,13 +17,12 @@ jobs:
     steps:
       - name: Trigger Vercel Deploy Hook
         run: |
-          echo "🚀 Triggering Vercel deployment..."
+          echo "🚀 Triggering Vercel deployment for daily menu update..."
           curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
           echo "✅ Deployment triggered successfully!"
           echo "📊 Check deployment status: https://vercel.com/dashboard"
 
-# 참고: Vercel Deploy Hook URL 설정 방법
-# 1. Vercel Dashboard → 프로젝트 → Settings → Git
-# 2. "Deploy Hooks" 섹션에서 새 Hook 생성
-# 3. Hook URL을 GitHub Secrets에 VERCEL_DEPLOY_HOOK으로 저장
+# 평일 10:10에만 자동 재빌드
+# Push 시에는 Vercel이 자동으로 배포
+
 
