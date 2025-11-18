@@ -6,7 +6,7 @@ on:
   schedule:
     # 평일 오전 11시 35분 (KST = UTC+9, 따라서 UTC 02:35)
     # 월-금 실행
-    - cron: '38 2 * * 1-5'
+  - cron: '10 1 * * 1-5'
   workflow_dispatch: # 수동 실행도 가능하게
 jobs:
   Deploy-Production:
