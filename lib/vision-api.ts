@@ -4,17 +4,13 @@ import { cleanMenuText } from './text-cleaner';
 
 import path from 'path';
 
-// Google Vision API 클라이언트 초기화
-// Vercel: GOOGLE_SERVICE_ACCOUNT_KEY 환경 변수 사용 (JSON 문자열)
-// 로컬 개발: service-account.json 파일 사용
 const getVisionClient = () => {
-  // Vercel 배포 환경: 환경 변수에서 서비스 계정 키 로드
-  if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
+  if (process.env.SERVICE_ACCOUNT_JSON) {
     try {
-      const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
+      const credentials = JSON.parse(process.env.SERVICE_ACCOUNT_JSON);
       return new ImageAnnotatorClient({ credentials });
     } catch (error) {
-      console.error('Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY:', error);
+      console.error('Failed to parse SERVICE_ACCOUNT_JSON:', error);
       throw error;
     }
   }
