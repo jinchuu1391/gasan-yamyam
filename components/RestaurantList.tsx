@@ -1,7 +1,7 @@
-import { Restaurant } from '@/lib/types';
-import Image from 'next/image';
-import { useState, useMemo, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Restaurant } from "@/lib/types";
+import Image from "next/image";
+import { useState, useMemo, useEffect } from "react";
+import { Search } from "lucide-react";
 
 interface RestaurantListProps {
   restaurants?: Restaurant[];
@@ -13,26 +13,26 @@ interface RestaurantListProps {
 
 function formatLastUpdated(dateString?: string) {
   if (!dateString) return null;
-  
+
   const date = new Date(dateString);
-  return date.toLocaleString('ko-KR', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+  return date.toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
-export default function RestaurantList({ 
-  restaurants = [], 
-  selectedRestaurantId, 
-  onRestaurantSelect, 
+export default function RestaurantList({
+  restaurants = [],
+  selectedRestaurantId,
+  onRestaurantSelect,
   lastUpdated,
-  gridColumns = 1 
+  gridColumns = 1,
 }: RestaurantListProps) {
-  const [inputValue, setInputValue] = useState(''); // 사용자 입력값
-  const [searchTerm, setSearchTerm] = useState(''); // 실제 검색에 사용되는 값
+  const [inputValue, setInputValue] = useState(""); // 사용자 입력값
+  const [searchTerm, setSearchTerm] = useState(""); // 실제 검색에 사용되는 값
 
   // 디바운싱: 입력이 멈춘 후 1초 뒤에 검색 실행
   useEffect(() => {
@@ -46,8 +46,8 @@ export default function RestaurantList({
 
   const filteredRestaurants = useMemo(() => {
     if (!searchTerm.trim()) return restaurants;
-    
-    return restaurants?.filter(restaurant => {
+
+    return restaurants?.filter((restaurant) => {
       const searchText = searchTerm.toLowerCase();
       return (
         restaurant.name.toLowerCase().includes(searchText) ||
@@ -72,49 +72,85 @@ export default function RestaurantList({
         </div>
         <div className="flex justify-between items-center mt-2">
           <p className="text-sm text-gray-600">
-            {filteredRestaurants.length}개 식당 {searchTerm && `(전체 ${restaurants.length}개 중)`}
+            {filteredRestaurants.length}개 식당{" "}
+            {searchTerm && `(전체 ${restaurants.length}개 중)`}
           </p>
           {lastUpdated && (
-            <p className="text-xs text-gray-500">
-              {formatLastUpdated(lastUpdated)}
-            </p>
+            <>
+              <p className="text-xs text-gray-500 text-right">
+                기준 시간: {formatLastUpdated(lastUpdated)}
+                <br />
+                (📢평일 오전 10:10~11:00에 자동 업데이트되며 점심 메뉴만
+                제공됩니다.)
+              </p>
+            </>
           )}
         </div>
       </div>
-      
+
       <div className="overflow-y-auto h-[calc(100%-6rem)] md:h-[calc(100%-6rem)]">
-        <div className={`pb-6 ${gridColumns === 2 ? 'grid grid-cols-2 gap-4 p-4' : 'space-y-0'}`}>
+        <div
+          className={`pb-6 ${
+            gridColumns === 2 ? "grid grid-cols-2 gap-4 p-4" : "space-y-0"
+          }`}
+        >
           {filteredRestaurants.map((restaurant) => (
-            <div 
-              key={restaurant.id} 
-              className={`${gridColumns === 2 ? 'flex flex-col' : ''} ${gridColumns !== 2 ? 'border-b border-gray-100' : ''} transition-all cursor-pointer ${
+            <div
+              key={restaurant.id}
+              className={`${gridColumns === 2 ? "flex flex-col" : ""} ${
+                gridColumns !== 2 ? "border-b border-gray-100" : ""
+              } transition-all cursor-pointer ${
                 selectedRestaurantId === restaurant.id
-                  ? 'bg-blue-50 rounded-lg'
-                  : 'bg-white hover:bg-gray-50 border border-gray-200 rounded-lg hover:shadow-md'
+                  ? "bg-blue-50 rounded-lg"
+                  : "bg-white hover:bg-gray-50 border border-gray-200 rounded-lg hover:shadow-md"
               }`}
               onClick={() => onRestaurantSelect?.(restaurant.id)}
             >
               {/* 식당명 - 가운데 정렬 */}
-              <div className={`${gridColumns === 2 ? 'p-3 border-b' : 'p-4 pb-2'} bg-gray-50`}>
-                <h3 
+              <div
+                className={`${
+                  gridColumns === 2 ? "p-3 border-b" : "p-4 pb-2"
+                } bg-gray-50`}
+              >
+                <h3
                   className={`text-lg font-bold text-center transition-colors`}
                 >
                   {restaurant.name}
                 </h3>
               </div>
-              
+
               {/* 메뉴 내용 - 고정 높이 */}
-              <div className={`${gridColumns === 2 ? 'flex-1 p-3' : 'p-4 pt-2'} overflow-hidden`}>
-                <div className={gridColumns === 2 ? 'h-64 overflow-y-auto' : ''}>
+              <div
+                className={`${
+                  gridColumns === 2 ? "flex-1 p-3" : "p-4 pt-2"
+                } overflow-hidden`}
+              >
+                <div
+                  className={gridColumns === 2 ? "h-64 overflow-y-auto" : ""}
+                >
                   {restaurant.error ? (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                       <div className="flex items-start space-x-2">
-                        <svg className="w-4 h-4 text-red-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <svg
+                          className="w-4 h-4 text-red-500 mt-0.5 shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
                         </svg>
                         <div>
-                          <p className="text-sm font-medium text-red-800">메뉴 정보를 불러올 수 없습니다</p>
-                          <p className="text-xs text-red-600 mt-1">{restaurant.error}</p>
+                          <p className="text-sm font-medium text-red-800">
+                            메뉴 정보를 불러올 수 없습니다
+                          </p>
+                          <p className="text-xs text-red-600 mt-1">
+                            {restaurant.error}
+                          </p>
                         </div>
                       </div>
                     </div>
